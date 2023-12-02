@@ -1,9 +1,9 @@
 {
-  "name": "goit-react-hw-02-feedback",
+  "name": "goit-react-hw-03-image-finder",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://rafallakomiec.github.io/goit-react-hw-02-feedback/",
+  "homepage": "https://rafallakomiec.github.io/goit-react-hw-03-image-finder/",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
