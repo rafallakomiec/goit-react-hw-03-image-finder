@@ -3,6 +3,7 @@ import { Searchbar } from './components/Searchbar/Searchbar';
 import { fetchHandler } from './utils/fetchHandlers/fetchHandler';
 import { ImageGallery } from './components/ImageGallery/ImageGallery';
 import { ImageGalleryItem } from './components/ImageGalleryItem/ImageGalleryItem';
+import { Button } from './components/Button/Button';
 
 const PER_PAGE = 12;
 
@@ -10,6 +11,7 @@ class App extends Component {
 
   state = {
     pageNo: 1,
+    searchPhrase: '',
     images: [],
     totalHits: 0
   };
@@ -17,11 +19,22 @@ class App extends Component {
   onSubmitHandler = (event) => {
     event.preventDefault();
     const searchPhrase = event.target.elements.searchInput.value;
-    this.setState({pageNo: 1}, () => { 
-      const response = fetchHandler(searchPhrase, this.state.pageNo, PER_PAGE).hits;
-      this.setState({ images: response });
-    });
+    this.setState({ pageNo: 1, searchPhrase: searchPhrase },
+      () => { 
+        const response = fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
+        this.setState({ images: response.hits, totalHits: response.total });
+      });
     
+  }
+
+  loadMoreHandler = () => {
+    this.setState(() => {
+      this.setState({ pageNo: this.state.pageNo + 1 }, () => {
+          const response = fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
+          this.setState({ images: [...this.state.images, ...response.hits] });
+      });
+    });
+
   }
 
   render() {
@@ -38,6 +51,9 @@ class App extends Component {
           <ImageGallery>
             {imageGalleryItems}
           </ImageGallery>
+        }
+        {this.state.totalHits - (PER_PAGE * this.state.pageNo) > 0 &&
+          <Button onClick={this.loadMoreHandler} />
         }
       </>
     );
