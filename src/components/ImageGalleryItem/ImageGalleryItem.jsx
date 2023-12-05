@@ -7,13 +7,14 @@ class ImageGalleryItem extends Component {
     key: PropTypes.string.isRequired,
     image: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
+    onClick: PropTypes.func.isRequired
   };
 
   render() {
     const { key, image, description } = this.props;
 
     return (
-      <li key={key} className={css.imageGalleryItem}>
+      <li key={key} className={css.imageGalleryItem} onClick={this.props.onClick}>
         <img className={css.imageGalleryItemImage} src={image} alt={description} />
       </li>
     );
