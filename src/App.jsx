@@ -1,13 +1,13 @@
 import { Component } from 'react';
 import css from './App.module.css';
 import cssModal from './components/Modal/Modal.module.css';
-import { Searchbar } from './components/Searchbar/Searchbar';
-import { fetchHandler } from './utils/fetchHandlers/fetchHandler';
-import { ImageGallery } from './components/ImageGallery/ImageGallery';
-import { ImageGalleryItem } from './components/ImageGalleryItem/ImageGalleryItem';
-import { Button } from './components/Button/Button';
+import Searchbar from './components/Searchbar/Searchbar';
+import fetchHandler from './utils/fetchHandlers/fetchHandler.js';
+import ImageGallery from './components/ImageGallery/ImageGallery';
+import ImageGalleryItem from './components/ImageGalleryItem/ImageGalleryItem';
+import Button from './components/Button/Button';
 import { TailSpin } from 'react-loader-spinner';
-import { Modal } from './components/Modal/Modal';
+import Modal from './components/Modal/Modal';
 
 const PER_PAGE = 12;
 
