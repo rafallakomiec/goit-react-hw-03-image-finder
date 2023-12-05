@@ -2,15 +2,14 @@ import axios from "axios";
 
 const API_KEY = '35303781-845e93066b0b0a407fb33e213';
 const BASE_URL = 'https://pixabay.com/api/';
-const PER_PAGE = 12;
 
-const fetchHandler = async (searchPhrase, pageNo) => {
+const fetchHandler = async (searchPhrase, pageNo, perPage) => {
     try {
         const config = {
             url: BASE_URL,
             key: API_KEY,
             q: searchPhrase,
-            perPage: PER_PAGE,
+            perPage: perPage,
             page: pageNo,
             image_type: 'photo',
             orientation: 'horizontal'

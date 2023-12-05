@@ -4,18 +4,21 @@ import { fetchHandler } from './utils/fetchHandlers/fetchHandler';
 import { ImageGallery } from './components/ImageGallery/ImageGallery';
 import { ImageGalleryItem } from './components/ImageGalleryItem/ImageGalleryItem';
 
+const PER_PAGE = 12;
+
 class App extends Component {
 
   state = {
     pageNo: 1,
-    images: []
+    images: [],
+    totalHits: 0
   };
 
   onSubmitHandler = (event) => {
     event.preventDefault();
     const searchPhrase = event.target.elements.searchInput.value;
     this.setState({pageNo: 1}, () => { 
-      const response = fetchHandler(searchPhrase, this.state.pageNo).hits;
+      const response = fetchHandler(searchPhrase, this.state.pageNo, PER_PAGE).hits;
       this.setState({ images: response });
     });
     
