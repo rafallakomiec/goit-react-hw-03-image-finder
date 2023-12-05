@@ -7,7 +7,7 @@ import { ImageGallery } from './components/ImageGallery/ImageGallery';
 import { ImageGalleryItem } from './components/ImageGalleryItem/ImageGalleryItem';
 import { Button } from './components/Button/Button';
 import { TailSpin } from 'react-loader-spinner';
-import { Modal } from './components/Modal';
+import { Modal } from './components/Modal/Modal';
 
 const PER_PAGE = 12;
 
