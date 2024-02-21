@@ -26,14 +26,16 @@ class App extends Component {
     event.preventDefault();
     const searchPhrase = event.target.elements.searchInput.value;
     this.setState({ pageNo: 1, searchPhrase: searchPhrase, isSpinnerOn: true }, () => {
-      const response = fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
-      this.setState({ images: response.hits, totalHits: response.total, isSpinnerOn: false });
+      const responseData = fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE).data;
+      this.setState({ images: responseData.hits, totalHits: responseData.total, isSpinnerOn: false });
     });
   };
 
   openModalHandler = event => {
     const imageKey = event.target.getAttribute('key');
     const image = this.state.images.find(item => item.id === imageKey);
+
+    document.querySelector(cssModal.overlay).style = { visibility: 'visible', opacity: 1 };
 
     this.setState({
       isSpinnerOn: true,
@@ -46,25 +48,29 @@ class App extends Component {
   };
 
   modalImageLoadedHandler = () => {
+    document.querySelector(cssModal.modalImg).style = { visibility: 'visible', opacity: 1 };
     this.setState({ isSpinnerOn: false });
   };
 
   modalCloseHandler = event => {
     if (
-      (event.target.tagName === 'DIV' &&
+      ((event.target.tagName === 'DIV' || event.target.tagName === 'IMG') &&
         (event.target.className === cssModal.overlay ||
-          event.target.className === cssModal.modal)) ||
+          event.target.className === cssModal.modal ||
+          event.target.className === cssModal.modalImg)) ||
       event.key === 'Escape'
     ) {
-      this.setState({ isModalOn: false, isSpinnerOn: false }, () => {});
+      document.querySelector(cssModal.overlay).style = { visibility: 'hidden', opacity: 0 };
+      document.querySelector(cssModal.modalImg).style = { visibility: 'hidden', opacity: 0 };
+      this.setState({ isModalOn: false, isSpinnerOn: false, currentModal: {} });
     }
   };
 
   loadMoreHandler = () => {
     this.setState(() => {
       this.setState({ pageNo: this.state.pageNo + 1, isSpinnerOn: true }, () => {
-        const response = fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
-        this.setState({ images: [...this.state.images, ...response.hits], isSpinnerOn: false });
+        const responseData = fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE).data;
+        this.setState({ images: [...this.state.images, ...responseData.hits], isSpinnerOn: false });
       });
     });
   };
@@ -86,7 +92,7 @@ class App extends Component {
         <div className={css.app}>
           <Searchbar onSubmit={this.onSubmitHandler} />
           {this.state.images.length > 0 && <ImageGallery>{imageGalleryItems}</ImageGallery>}
-          {this.state.totalHits - PER_PAGE * this.state.pageNo > 0 && (
+          {this.state.totalHits - (PER_PAGE * this.state.pageNo) > 0 && (
             <Button onClick={this.loadMoreHandler} />
           )}
         </div>

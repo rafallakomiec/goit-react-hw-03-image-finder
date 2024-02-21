@@ -19,6 +19,7 @@ class Modal extends Component {
       >
         <div className={css.modal}>
           <img
+            className={css.modalImg}
             src={this.props.image}
             alt={this.props.description}
             onLoad={this.props.handleImageLoaded}
