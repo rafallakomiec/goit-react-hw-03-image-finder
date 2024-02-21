@@ -2,7 +2,7 @@
 
 html {
   box-sizing: border-box;
-  width: 100vw;
+  width: calc(100vw - 20px);
   overflow-x: hidden;
 }
 
@@ -26,4 +26,8 @@ img {
   display: block;
   max-width: 100%;
   height: auto;
+}
+
+#root {
+  margin: 0 auto;
 }
