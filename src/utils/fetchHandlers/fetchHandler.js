@@ -6,15 +6,16 @@ const BASE_URL = 'https://pixabay.com/api/';
 const fetchHandler = async (searchPhrase, pageNo, perPage) => {
     try {
         const config = {
-            url: BASE_URL,
+          params: {
             key: API_KEY,
             q: searchPhrase,
             perPage: perPage,
             page: pageNo,
             image_type: 'photo',
-            orientation: 'horizontal'
+            orientation: 'horizontal',
+          },
         };
-        const response = await axios.get(config);
+        const response = await axios.get(BASE_URL, config);
         return response;
     } catch (error) {
         alert(`Error occurred ${error.message}. Please try again.`);

@@ -25,9 +25,9 @@ class App extends Component {
   onSubmitHandler = event => {
     event.preventDefault();
     const searchPhrase = event.target.elements.searchInput.value;
-    this.setState({ pageNo: 1, searchPhrase: searchPhrase, isSpinnerOn: true }, () => {
-      const responseData = fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE).data;
-      this.setState({ images: responseData.hits, totalHits: responseData.total, isSpinnerOn: false });
+    this.setState({ pageNo: 1, searchPhrase: searchPhrase, isSpinnerOn: true }, async () => {
+      const responseData = await fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
+      this.setState({ images: responseData.data.hits, totalHits: responseData.data.total, isSpinnerOn: false });
     });
   };
 
@@ -35,7 +35,9 @@ class App extends Component {
     const imageKey = event.target.getAttribute('key');
     const image = this.state.images.find(item => item.id === imageKey);
 
-    document.querySelector(cssModal.overlay).style = { visibility: 'visible', opacity: 1 };
+    const overlay = document.querySelector('.' + cssModal.overlay);
+    overlay.style.visibility = 'visible';
+    overlay.style.opacity = 1;
 
     this.setState({
       isSpinnerOn: true,
@@ -48,7 +50,9 @@ class App extends Component {
   };
 
   modalImageLoadedHandler = () => {
-    document.querySelector(cssModal.modalImg).style = { visibility: 'visible', opacity: 1 };
+    const modalImg = document.querySelector('.' + cssModal.modalImg);
+    modalImg.style.visibility = 'visible';
+    modalImg.style.opacity = 1;
     this.setState({ isSpinnerOn: false });
   };
 
@@ -60,17 +64,22 @@ class App extends Component {
           event.target.className === cssModal.modalImg)) ||
       event.key === 'Escape'
     ) {
-      document.querySelector(cssModal.overlay).style = { visibility: 'hidden', opacity: 0 };
-      document.querySelector(cssModal.modalImg).style = { visibility: 'hidden', opacity: 0 };
+      const overlay = document.querySelector('.' + cssModal.overlay);
+      overlay.style.visibility = 'hidden';
+      overlay.style.opacity = 0;
+      const modalImg = document.querySelector('.' + cssModal.modalImg);
+      modalImg.style.visibility = 'hidden';
+      modalImg.style.opacity = 0;
+    
       this.setState({ isModalOn: false, isSpinnerOn: false, currentModal: {} });
     }
   };
 
   loadMoreHandler = () => {
     this.setState(() => {
-      this.setState({ pageNo: this.state.pageNo + 1, isSpinnerOn: true }, () => {
-        const responseData = fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE).data;
-        this.setState({ images: [...this.state.images, ...responseData.hits], isSpinnerOn: false });
+      this.setState({ pageNo: this.state.pageNo + 1, isSpinnerOn: true }, async () => {
+        const responseData = await fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
+        this.setState({ images: [...this.state.images, ...responseData.data.hits], isSpinnerOn: false });
       });
     });
   };
@@ -79,9 +88,10 @@ class App extends Component {
     const imageGalleryItems = this.state.images.map(item => {
       return (
         <ImageGalleryItem
-          key={item.id}
+          key={item.id.toString()}
+          keyValue={item.id.toString()}
           description={item.tags}
-          image={item.webFormatURL}
+          image={item.webformatURL}
           onClick={this.openModalHandler}
         />
       );
