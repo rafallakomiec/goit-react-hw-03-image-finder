@@ -1,6 +1,5 @@
 import { Component } from 'react';
 import css from './App.module.css';
-import cssModal from './components/Modal/Modal.module.css';
 import Searchbar from './components/Searchbar/Searchbar';
 import fetchHandler from './utils/fetchHandlers/fetchHandler.js';
 import ImageGallery from './components/ImageGallery/ImageGallery';
@@ -8,6 +7,8 @@ import ImageGalleryItem from './components/ImageGalleryItem/ImageGalleryItem';
 import Button from './components/Button/Button';
 import { TailSpin } from 'react-loader-spinner';
 import Modal from './components/Modal/Modal';
+import { nanoid } from 'nanoid';
+
 
 const PER_PAGE = 12;
 
@@ -31,13 +32,8 @@ class App extends Component {
     });
   };
 
-  openModalHandler = event => {
-    const imageKey = event.target.getAttribute('key');
-    const image = this.state.images.find(item => item.id === imageKey);
-
-    const overlay = document.querySelector('.' + cssModal.overlay);
-    overlay.style.visibility = 'visible';
-    overlay.style.opacity = 1;
+  openModalHandler = (event, imageKey) => {
+    const image = this.state.images.find(item => item.id == imageKey);
 
     this.setState({
       isSpinnerOn: true,
@@ -50,45 +46,31 @@ class App extends Component {
   };
 
   modalImageLoadedHandler = () => {
-    const modalImg = document.querySelector('.' + cssModal.modalImg);
-    modalImg.style.visibility = 'visible';
-    modalImg.style.opacity = 1;
     this.setState({ isSpinnerOn: false });
   };
 
   modalCloseHandler = event => {
     if (
-      ((event.target.tagName === 'DIV' || event.target.tagName === 'IMG') &&
-        (event.target.className === cssModal.overlay ||
-          event.target.className === cssModal.modal ||
-          event.target.className === cssModal.modalImg)) ||
+      event.target.tagName === 'DIV' ||
+      event.target.tagName === 'IMG' ||
       event.key === 'Escape'
     ) {
-      const overlay = document.querySelector('.' + cssModal.overlay);
-      overlay.style.visibility = 'hidden';
-      overlay.style.opacity = 0;
-      const modalImg = document.querySelector('.' + cssModal.modalImg);
-      modalImg.style.visibility = 'hidden';
-      modalImg.style.opacity = 0;
-    
       this.setState({ isModalOn: false, isSpinnerOn: false, currentModal: {} });
     }
   };
 
   loadMoreHandler = () => {
-    this.setState(() => {
       this.setState({ pageNo: this.state.pageNo + 1, isSpinnerOn: true }, async () => {
         const responseData = await fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
         this.setState({ images: [...this.state.images, ...responseData.data.hits], isSpinnerOn: false });
       });
-    });
   };
 
   render() {
     const imageGalleryItems = this.state.images.map(item => {
       return (
         <ImageGalleryItem
-          key={item.id.toString()}
+          key={nanoid()}
           keyValue={item.id.toString()}
           description={item.tags}
           image={item.webformatURL}
@@ -112,6 +94,8 @@ class App extends Component {
             description={this.state.currentModal.tags}
             handleImageLoaded={this.modalImageLoadedHandler}
             handleModalClose={this.modalCloseHandler}
+            isModalOn={this.state.isModalOn}
+            isSpinnerOn={this.state.isSpinnerOn}
           />
         )}
         <TailSpin
@@ -121,11 +105,19 @@ class App extends Component {
           ariaLabel="tail-spin-loading"
           radius="1"
           wrapperStyle={{}}
-          wrapperClass=""
+          wrapperClass={css.spinner}
           visible={this.state.isSpinnerOn}
         />
       </>
     );
+  }
+
+  componentDidMount() {
+    window.addEventListener('keyup', event => {
+      if (event.key === 'Escape') {
+        this.setState({ isModalOn: false, isSpinnerOn: false, currentModal: {} });
+      }
+    });
   }
 }
 

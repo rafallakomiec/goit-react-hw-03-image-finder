@@ -4,3 +4,11 @@
   grid-gap: 16px;
   padding-bottom: 24px;
 }
+
+.spinner {
+  margin: auto;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
