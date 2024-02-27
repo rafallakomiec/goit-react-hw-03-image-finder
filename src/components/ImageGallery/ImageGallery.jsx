@@ -1,14 +1,28 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import css from './ImageGallery.module.css';
+import { nanoid } from 'nanoid';
+import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 
 class ImageGallery extends Component {
   static propTypes = {
-    children: PropTypes.arrayOf(PropTypes.element).isRequired,
+    images: PropTypes.arrayOf(PropTypes.object).isRequired,
+    openModalHandler: PropTypes.func.isRequired
   };
 
   render() {
-    return <ul className={css.imageGallery}>{this.props.children}</ul>;
+    const imageGalleryItems = this.props.images.map(item => {
+      return (
+        <ImageGalleryItem
+          key={nanoid()}
+          keyValue={item.id.toString()}
+          description={item.tags}
+          image={item.webformatURL}
+          onClick={this.props.openModalHandler}
+        />
+      );
+    });
+    return <ul className={css.imageGallery}>{imageGalleryItems}</ul>;
   }
 }
 

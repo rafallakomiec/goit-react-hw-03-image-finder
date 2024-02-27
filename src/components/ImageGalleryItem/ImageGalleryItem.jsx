@@ -10,13 +10,13 @@ class ImageGalleryItem extends Component {
     onClick: PropTypes.func.isRequired
   };
 
-  onClickKeyd = () => (event) => this.props.onClick(event, this.props.keyValue);
+  onClickKeyify = () => () => this.props.onClick(this.props.keyValue);
 
   render() {
     const { keyValue, image, description } = this.props;
 
     return (
-      <li key={keyValue} className={css.imageGalleryItem} onClick={this.onClickKeyd()}>
+      <li key={keyValue} className={css.imageGalleryItem} onClick={this.onClickKeyify()}>
         <img className={css.imageGalleryItemImage} src={image} alt={description} />
       </li>
     );

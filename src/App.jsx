@@ -3,11 +3,9 @@ import css from './App.module.css';
 import Searchbar from './components/Searchbar/Searchbar';
 import fetchHandler from './utils/fetchHandlers/fetchHandler.js';
 import ImageGallery from './components/ImageGallery/ImageGallery';
-import ImageGalleryItem from './components/ImageGalleryItem/ImageGalleryItem';
 import Button from './components/Button/Button';
 import { TailSpin } from 'react-loader-spinner';
 import Modal from './components/Modal/Modal';
-import { nanoid } from 'nanoid';
 
 
 const PER_PAGE = 12;
@@ -23,16 +21,19 @@ class App extends Component {
     currentModal: {},
   };
 
+  keyboardHandler = event => {
+    if (event.key === 'Escape') {
+      this.setState({ isModalOn: false, isSpinnerOn: false, currentModal: {} });
+    }
+  };
+
   onSubmitHandler = event => {
     event.preventDefault();
     const searchPhrase = event.target.elements.searchInput.value;
-    this.setState({ pageNo: 1, searchPhrase: searchPhrase, isSpinnerOn: true }, async () => {
-      const responseData = await fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
-      this.setState({ images: responseData.data.hits, totalHits: responseData.data.total, isSpinnerOn: false });
-    });
+    this.setState({ pageNo: 1, searchPhrase: searchPhrase, isSpinnerOn: true });
   };
 
-  openModalHandler = (event, imageKey) => {
+  openModalHandler = (imageKey) => {
     const image = this.state.images.find(item => item.id == imageKey);
 
     this.setState({
@@ -60,31 +61,16 @@ class App extends Component {
   };
 
   loadMoreHandler = () => {
-      this.setState({ pageNo: this.state.pageNo + 1, isSpinnerOn: true }, async () => {
-        const responseData = await fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
-        this.setState({ images: [...this.state.images, ...responseData.data.hits], isSpinnerOn: false });
-      });
+    this.setState({ pageNo: this.state.pageNo + 1, isSpinnerOn: true }, );
   };
 
   render() {
-    const imageGalleryItems = this.state.images.map(item => {
-      return (
-        <ImageGalleryItem
-          key={nanoid()}
-          keyValue={item.id.toString()}
-          description={item.tags}
-          image={item.webformatURL}
-          onClick={this.openModalHandler}
-        />
-      );
-    });
-
     return (
       <>
         <div className={css.app}>
           <Searchbar onSubmit={this.onSubmitHandler} />
-          {this.state.images.length > 0 && <ImageGallery>{imageGalleryItems}</ImageGallery>}
-          {this.state.totalHits - (PER_PAGE * this.state.pageNo) > 0 && (
+          {this.state.images.length > 0 && <ImageGallery images={this.state.images} openModalHandler={this.openModalHandler} />}
+          {this.state.totalHits - PER_PAGE * this.state.pageNo > 0 && (
             <Button onClick={this.loadMoreHandler} />
           )}
         </div>
@@ -113,11 +99,31 @@ class App extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('keyup', event => {
-      if (event.key === 'Escape') {
-        this.setState({ isModalOn: false, isSpinnerOn: false, currentModal: {} });
-      }
-    });
+    window.addEventListener('keyup', this.keyboardHandler);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keyup', this.keyboardHandler);
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if (prevState.searchPhrase !== this.state.searchPhrase) { 
+      const responseData = await fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
+      this.setState({
+        images: responseData.data.hits,
+        totalHits: responseData.data.total,
+        isSpinnerOn: false,
+      });
+      return true;
+    }
+    
+    if (prevState.searchPhrase === this.state.searchPhrase && prevState.pageNo !== this.state.pageNo) {
+      const responseData = await fetchHandler(this.state.searchPhrase, this.state.pageNo, PER_PAGE);
+      this.setState({
+        images: [...this.state.images, ...responseData.data.hits],
+        isSpinnerOn: false,
+      });
+    }
   }
 }
 
